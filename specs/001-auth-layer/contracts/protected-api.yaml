@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: Protected API Pattern
+  description: Example pattern for protected endpoints requiring JWT authentication
+  version: 1.0.0
+  contact:
+    name: Todo App API
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://api.todo-app.com
+    description: Production server
+
+paths:
+  /api/protected-resource:
+    get:
+      summary: Example protected endpoint
+      description: |
+        This is a pattern/template for protected endpoints. All protected endpoints MUST:
+        - Require JWT token via Authorization header
+        - Extract user_id from verified token
+        - Filter data by authenticated user_id
+        - Return 401 if token missing/invalid
+        - Return 403 if attempting to access other user's data
+      operationId: getProtectedResource
+      tags:
+        - Protected Resources
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Resource retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    description: Resource data filtered by authenticated user
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: Authenticated user's ID (for verification)
+              examples:
+                success:
+                  summary: Successful retrieval
+                  value:
+                    data:
+                      id: 123
+                      name: Example Resource
+                      user_id: 550e8400-e29b-41d4-a716-446655440000
+                    user_id: 550e8400-e29b-41d4-a716-446655440000
+        '401':
+          description: Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_token:
+                  summary: No Authorization header
+                  value:
+                    detail: Not authenticated
+                invalid_token:
+                  summary: Invalid or expired token
+                  value:
+                    detail: Could not validate credentials
+                expired_token:
+                  summary: Token expired
+                  value:
+                    detail: Token has expired
+        '403':
+          description: Forbidden - attempting to access another user's data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                forbidden:
+                  summary: Cross-user access attempt
+                  value:
+                    detail: Access forbidden
+
+  /api/user-specific/{resource_id}:
+    get:
+      summary: Example endpoint with resource ID
+      description: |
+        Pattern for endpoints accessing specific resources by ID.
+        Backend MUST verify that resource belongs to authenticated user.
+      operationId: getUserSpecificResource
+      tags:
+        - Protected Resources
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: resource_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Resource identifier
+      responses:
+        '200':
+          description: Resource retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  user_id:
+                    type: string
+                    format: uuid
+                  data:
+                    type: object
+        '401':
+          description: Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Resource belongs to different user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                forbidden:
+                  summary: Resource ownership mismatch
+                  value:
+                    detail: Access forbidden
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                not_found:
+                  summary: Resource does not exist
+                  value:
+                    detail: Resource not found
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: Not authenticated
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token obtained from /auth/signup or /auth/signin.
+
+        Token must be included in Authorization header:
+        Authorization: Bearer <token>
+
+        Backend will:
+        1. Extract token from Authorization header
+        2. Verify signature using shared secret
+        3. Decode payload and extract user_id
+        4. Inject user_id into request context
+        5. Filter all queries by user_id
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Protected Resources
+    description: |
+      Pattern for all protected endpoints requiring authentication.
+
+      Implementation Requirements:
+      - Use FastAPI dependency injection: Depends(get_current_user)
+      - get_current_user extracts and verifies JWT, returns user_id
+      - All database queries MUST filter by user_id
+      - Never trust user_id from request body/query params
+      - Always use user_id from verified token
+
+x-implementation-notes:
+  backend-pattern: |
+    # FastAPI endpoint pattern
+    @router.get("/api/protected-resource")
+    async def get_protected_resource(
+        user_id: str = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ):
+        # user_id is extracted from verified JWT token
+        # Query MUST filter by user_id
+        resources = db.query(Resource).filter(
+            Resource.user_id == user_id
+        ).all()
+        return {"data": resources, "user_id": user_id}
+
+  frontend-pattern: |
+    // Next.js API call pattern
+    const token = localStorage.getItem("auth_token")
+
+    const response = await fetch("/api/protected-resource", {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    })
+
+    if (response.status === 401) {
+      // Token invalid/expired - redirect to signin
+      router.push("/signin")
+    }
+
+  security-checklist:
+    - "[ ] Token extracted from Authorization header only"
+    - "[ ] Token signature verified using shared secret"
+    - "[ ] user_id extracted from verified token payload"
+    - "[ ] All queries filtered by authenticated user_id"
+    - "[ ] No user_id accepted from client input"
+    - "[ ] 401 returned for missing/invalid token"
+    - "[ ] 403 returned for cross-user access attempts"
