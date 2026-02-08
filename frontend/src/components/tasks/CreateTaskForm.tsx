@@ -85,7 +85,7 @@ export function CreateTaskForm({ onClose }: CreateTaskFormProps) {
               maxLength={500}
               required
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {title.length}/500 characters
             </p>
           </div>
@@ -101,13 +101,13 @@ export function CreateTaskForm({ onClose }: CreateTaskFormProps) {
               maxLength={2000}
               rows={4}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {description.length}/2000 characters
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md text-sm">
               {error}
             </div>
           )}

@@ -119,7 +119,7 @@ export default function SignupForm() {
           required
         />
         {emailError && (
-          <p className="text-red-500 text-sm">{emailError}</p>
+          <p className="text-destructive text-sm">{emailError}</p>
         )}
       </div>
 
@@ -139,15 +139,15 @@ export default function SignupForm() {
           required
         />
         {passwordError && (
-          <p className="text-red-500 text-sm">{passwordError}</p>
+          <p className="text-destructive text-sm">{passwordError}</p>
         )}
-        <p className="text-gray-500 text-xs">
+        <p className="text-muted-foreground text-xs">
           Must be at least 8 characters with uppercase, lowercase, and digit
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md text-sm">
           {error}
         </div>
       )}

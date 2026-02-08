@@ -30,7 +30,7 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-lg shadow border border-border p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
         {/* Checkbox */}
         <Checkbox
@@ -43,16 +43,16 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
         {/* Task Content */}
         <div className="flex-1 min-w-0">
           <h3
-            className={`font-medium text-gray-900 ${
-              task.completed ? 'line-through text-gray-500' : ''
+            className={`font-medium text-card-foreground ${
+              task.completed ? 'line-through text-muted-foreground' : ''
             }`}
           >
             {task.title}
           </h3>
           {task.description && (
-            <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+            <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
           )}
-          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
             <span>
               Created {formatDistanceToNow(new Date(task.created_at), { addSuffix: true })}
             </span>

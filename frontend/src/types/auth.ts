@@ -25,3 +25,13 @@ export interface AuthState {
   token: string | null
   loading: boolean
 }
+
+/**
+ * Decoded JWT token payload structure
+ */
+export interface DecodedToken {
+  user_id: string         // UUID of authenticated user
+  email: string           // User's email address
+  exp: number             // Expiration timestamp (Unix epoch seconds)
+  iat: number             // Issued at timestamp (Unix epoch seconds)
+}
