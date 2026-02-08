@@ -1,114 +1,103 @@
-'use client';
+'use client'
 
 /**
  * SigninForm component for user authentication.
  * Handles credential validation, API calls, and error display.
  */
 
-import { useState, FormEvent } from 'react';
-import { apiCall } from '@/lib/api-client';
+import { useState, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { apiCall } from '@/lib/api-client'
+import type { AuthResponse } from '@/types/auth'
 
-interface SigninFormProps {
-  onSuccess?: () => void;
-}
-
-interface AuthResponse {
-  user: {
-    id: string;
-    email: string;
-    created_at: string;
-  };
-  token: string;
-}
-
-export default function SigninForm({ onSuccess }: SigninFormProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function SigninForm() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError('')
 
+    // Validation
     if (!email || !password) {
-      setError('Email and password are required');
-      return;
+      setError('Email and password are required')
+      return
     }
 
-    setLoading(true);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address')
+      return
+    }
+
+    setLoading(true)
 
     try {
       // Call signin API
       const response = await apiCall<AuthResponse>('/auth/signin', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
-      });
+      })
 
       // Store token in localStorage
-      localStorage.setItem('auth_token', response.token);
+      localStorage.setItem('auth_token', response.token)
 
-      // Call success callback
-      if (onSuccess) {
-        onSuccess();
-      }
+      // Redirect to dashboard
+      router.push('/dashboard')
     } catch (err) {
       // Display error
       if (err instanceof Error) {
-        setError(err.message);
+        setError(err.message)
       } else {
-        setError('An unexpected error occurred');
+        setError('An unexpected error occurred')
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
-          Email
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="you@example.com"
           disabled={loading}
           required
         />
       </div>
 
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-1">
-          Password
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
           id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="••••••••"
           disabled={loading}
           required
         />
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
           {error}
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-      >
+      <Button type="submit" disabled={loading} className="w-full">
         {loading ? 'Signing in...' : 'Sign In'}
-      </button>
+      </Button>
     </form>
-  );
+  )
 }
