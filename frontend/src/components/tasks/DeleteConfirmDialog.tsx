@@ -32,10 +32,10 @@ export function DeleteConfirmDialog({ task, onConfirm, onCancel }: DeleteConfirm
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-gray-50 rounded-lg p-4 my-4">
-          <p className="font-medium text-gray-900">{task.title}</p>
+        <div className="bg-muted/50 rounded-lg p-4 my-4">
+          <p className="font-medium text-foreground">{task.title}</p>
           {task.description && (
-            <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+            <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
           )}
         </div>
 

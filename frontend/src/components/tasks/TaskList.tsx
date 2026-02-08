@@ -57,7 +57,7 @@ export function TaskList() {
   // Error state
   if (isError) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
         <p className="font-medium">Error loading tasks</p>
         <p className="text-sm mt-1">{error?.message || 'An unexpected error occurred'}</p>
       </div>
@@ -81,12 +81,12 @@ export function TaskList() {
     <div className="space-y-6">
       {/* Create Task Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-foreground">
           Your Tasks ({tasks.length})
         </h2>
         <button
           onClick={() => setIsCreateFormOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
         >
           + New Task
         </button>

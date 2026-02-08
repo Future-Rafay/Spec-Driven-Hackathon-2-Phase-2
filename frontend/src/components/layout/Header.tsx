@@ -1,53 +1,46 @@
 /**
- * Header component with user menu and logout
+ * Header component with user menu, theme toggle, and logout
  */
 
 'use client'
 
 import React from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Container } from './Container'
+import { ThemeToggle } from './ThemeToggle'
+import { useSignout } from '@/lib/auth'
 
 interface HeaderProps {
-  user?: {
-    email: string
-  } | null
+  userEmail: string
 }
 
-export function Header({ user }: HeaderProps) {
-  const router = useRouter()
+export function Header({ userEmail }: HeaderProps) {
+  const signout = useSignout()
 
   const handleLogout = () => {
-    // Clear token from localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token')
-    }
-    // Redirect to signin
-    router.push('/signin')
+    signout()
   }
 
   return (
-    <header className="border-b bg-white">
+    <header className="border-b bg-background">
       <Container>
         <div className="flex items-center justify-between h-16">
           {/* Logo/Title */}
-          <Link href={user ? '/dashboard' : '/'} className="text-xl font-bold text-gray-900">
+          <Link href="/dashboard" className="text-xl font-bold text-foreground">
             Todo App
           </Link>
 
           {/* User Menu */}
-          {user && (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 hidden sm:inline">
-                {user.email}
-              </span>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Sign Out
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground hidden sm:inline">
+              {userEmail}
+            </span>
+            <ThemeToggle />
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              Sign Out
+            </Button>
+          </div>
         </div>
       </Container>
     </header>
