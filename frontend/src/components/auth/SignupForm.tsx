@@ -1,177 +1,160 @@
-'use client';
+'use client'
 
 /**
  * SignupForm component for user registration.
  * Handles email/password validation, API calls, and error display.
  */
 
-import { useState, FormEvent } from 'react';
-import { apiCall } from '@/lib/api-client';
+import { useState, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { apiCall } from '@/lib/api-client'
+import type { AuthResponse } from '@/types/auth'
 
-interface SignupFormProps {
-  onSuccess?: () => void;
-}
-
-interface AuthResponse {
-  user: {
-    id: string;
-    email: string;
-    created_at: string;
-  };
-  token: string;
-}
-
-export default function SignupForm({ onSuccess }: SignupFormProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function SignupForm() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   // Email validation
   const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!email) {
-      setEmailError('Email is required');
-      return false;
+      setEmailError('Email is required')
+      return false
     }
     if (!emailRegex.test(email)) {
-      setEmailError('Invalid email format');
-      return false;
+      setEmailError('Invalid email format')
+      return false
     }
-    setEmailError('');
-    return true;
-  };
+    setEmailError('')
+    return true
+  }
 
   // Password strength validation
   const validatePassword = (password: string): boolean => {
     if (!password) {
-      setPasswordError('Password is required');
-      return false;
+      setPasswordError('Password is required')
+      return false
     }
     if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
-      return false;
+      setPasswordError('Password must be at least 8 characters')
+      return false
     }
     if (!/[A-Z]/.test(password)) {
-      setPasswordError('Password must contain at least one uppercase letter');
-      return false;
+      setPasswordError('Password must contain at least one uppercase letter')
+      return false
     }
     if (!/[a-z]/.test(password)) {
-      setPasswordError('Password must contain at least one lowercase letter');
-      return false;
+      setPasswordError('Password must contain at least one lowercase letter')
+      return false
     }
     if (!/\d/.test(password)) {
-      setPasswordError('Password must contain at least one digit');
-      return false;
+      setPasswordError('Password must contain at least one digit')
+      return false
     }
-    setPasswordError('');
-    return true;
-  };
+    setPasswordError('')
+    return true
+  }
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError('')
 
     // Validate inputs
-    const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword(password);
+    const isEmailValid = validateEmail(email)
+    const isPasswordValid = validatePassword(password)
 
     if (!isEmailValid || !isPasswordValid) {
-      return;
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
 
     try {
       // Call signup API
       const response = await apiCall<AuthResponse>('/auth/signup', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
-      });
+      })
 
       // Store token in localStorage
-      localStorage.setItem('auth_token', response.token);
+      localStorage.setItem('auth_token', response.token)
 
-      // Call success callback
-      if (onSuccess) {
-        onSuccess();
-      }
+      // Redirect to dashboard
+      router.push('/dashboard')
     } catch (err) {
       // Display error
       if (err instanceof Error) {
-        setError(err.message);
+        setError(err.message)
       } else {
-        setError('An unexpected error occurred');
+        setError('An unexpected error occurred')
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
-          Email
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
           id="email"
           type="email"
           value={email}
           onChange={(e) => {
-            setEmail(e.target.value);
-            if (emailError) validateEmail(e.target.value);
+            setEmail(e.target.value)
+            if (emailError) validateEmail(e.target.value)
           }}
           onBlur={() => validateEmail(email)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="you@example.com"
           disabled={loading}
           required
         />
         {emailError && (
-          <p className="text-red-500 text-sm mt-1">{emailError}</p>
+          <p className="text-red-500 text-sm">{emailError}</p>
         )}
       </div>
 
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-1">
-          Password
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
           id="password"
           type="password"
           value={password}
           onChange={(e) => {
-            setPassword(e.target.value);
-            if (passwordError) validatePassword(e.target.value);
+            setPassword(e.target.value)
+            if (passwordError) validatePassword(e.target.value)
           }}
           onBlur={() => validatePassword(password)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="••••••••"
           disabled={loading}
           required
         />
         {passwordError && (
-          <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+          <p className="text-red-500 text-sm">{passwordError}</p>
         )}
-        <p className="text-gray-500 text-xs mt-1">
+        <p className="text-gray-500 text-xs">
           Must be at least 8 characters with uppercase, lowercase, and digit
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
           {error}
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-      >
+      <Button type="submit" disabled={loading} className="w-full">
         {loading ? 'Creating account...' : 'Sign Up'}
-      </button>
+      </Button>
     </form>
-  );
+  )
 }

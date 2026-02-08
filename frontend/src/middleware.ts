@@ -3,38 +3,29 @@
  * Checks for valid token and redirects to signin if not authenticated.
  */
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  // Get token from cookies or check if it exists in localStorage (client-side)
-  // Note: Since we're using localStorage, this middleware primarily handles
-  // route protection at the Next.js level. The actual token validation
-  // happens on the backend.
+  const { pathname } = request.nextUrl
 
-  const { pathname } = request.nextUrl;
+  // Define route types
+  const isAuthPage = pathname.startsWith('/signin') || pathname.startsWith('/signup')
+  const isProtectedPage = pathname.startsWith('/dashboard')
 
-  // Protected routes that require authentication
-  const protectedRoutes = ['/dashboard', '/profile'];
+  // For client-side token storage (localStorage), we can't check the token in middleware
+  // The actual authentication check happens in the page components
+  // This middleware handles basic routing logic
 
-  // Check if current path is protected
-  const isProtectedRoute = protectedRoutes.some(route =>
-    pathname.startsWith(route)
-  );
+  // If user is on auth page and tries to access protected route, let page component handle it
+  // If user is on protected route, let page component check localStorage and redirect if needed
 
-  if (isProtectedRoute) {
-    // For client-side token storage, we can't check the token here
-    // The actual authentication check happens in the page component
-    // This middleware serves as a first line of defense
-
-    // In a production app with httpOnly cookies, you would check the cookie here
-    // const token = request.cookies.get('auth_token');
-    // if (!token) {
-    //   return NextResponse.redirect(new URL('/signin', request.url));
-    // }
+  // Redirect root to signin for now (can be changed to landing page later)
+  if (pathname === '/') {
+    return NextResponse.next()
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
 export const config = {
@@ -48,4 +39,4 @@ export const config = {
      */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
-};
+}

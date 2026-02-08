@@ -1,22 +1,14 @@
-'use client';
+'use client'
 
 /**
  * Signup page for user registration.
  * Redirects to dashboard after successful signup.
  */
 
-import { useRouter } from 'next/navigation';
-import SignupForm from '@/components/auth/SignupForm';
-import Link from 'next/link';
+import SignupForm from '@/components/auth/SignupForm'
+import Link from 'next/link'
 
 export default function SignupPage() {
-  const router = useRouter();
-
-  const handleSuccess = () => {
-    // Redirect to dashboard after successful signup
-    router.push('/dashboard');
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -31,8 +23,8 @@ export default function SignupPage() {
             </Link>
           </p>
         </div>
-        <SignupForm onSuccess={handleSuccess} />
+        <SignupForm />
       </div>
     </div>
-  );
+  )
 }

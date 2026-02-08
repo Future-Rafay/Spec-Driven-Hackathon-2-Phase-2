@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 /**
  * Signin page for user authentication.
@@ -6,37 +6,32 @@
  * Redirects to dashboard if already authenticated.
  */
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import SigninForm from '@/components/auth/SigninForm';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import SigninForm from '@/components/auth/SigninForm'
+import Link from 'next/link'
 
 export default function SigninPage() {
-  const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
+  const router = useRouter()
+  const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
     // Check if user is already authenticated
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('auth_token')
     if (token) {
       // Redirect to dashboard if already signed in
-      router.push('/dashboard');
+      router.push('/dashboard')
     } else {
-      setIsChecking(false);
+      setIsChecking(false)
     }
-  }, [router]);
-
-  const handleSuccess = () => {
-    // Redirect to dashboard after successful signin
-    router.push('/dashboard');
-  };
+  }, [router])
 
   if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-gray-600">Checking authentication...</div>
       </div>
-    );
+    )
   }
 
   return (
@@ -53,8 +48,8 @@ export default function SigninPage() {
             </Link>
           </p>
         </div>
-        <SigninForm onSuccess={handleSuccess} />
+        <SigninForm />
       </div>
     </div>
-  );
+  )
 }
