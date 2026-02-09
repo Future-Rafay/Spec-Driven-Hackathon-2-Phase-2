@@ -11,10 +11,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { apiCall } from '@/lib/api-client'
+import { useAuth } from '@/hooks/useAuth'
 import type { AuthResponse } from '@/types/auth'
 
 export default function SigninForm() {
   const router = useRouter()
+  const { refreshAuth } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -46,6 +48,9 @@ export default function SigninForm() {
 
       // Store token in localStorage
       localStorage.setItem('auth_token', response.token)
+
+      // Refresh global auth state
+      await refreshAuth()
 
       // Redirect to dashboard
       router.push('/dashboard')

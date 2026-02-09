@@ -6,32 +6,17 @@
  * Redirects to dashboard if already authenticated.
  */
 
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { redirect } from 'next/navigation'
 import SigninForm from '@/components/auth/SigninForm'
 import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function SigninPage() {
-  const router = useRouter()
-  const [isChecking, setIsChecking] = useState(true)
+  const { isAuthenticated } = useAuth()
 
-  useEffect(() => {
-    // Check if user is already authenticated
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      // Redirect to dashboard if already signed in
-      router.push('/dashboard')
-    } else {
-      setIsChecking(false)
-    }
-  }, [router])
-
-  if (isChecking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-muted-foreground">Checking authentication...</div>
-      </div>
-    )
+  // Redirect to dashboard if already authenticated
+  if (isAuthenticated) {
+    redirect('/dashboard')
   }
 
   return (
