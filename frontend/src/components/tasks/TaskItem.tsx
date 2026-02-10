@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { Task } from '@/types/task'
-import { formatDistanceToNow } from 'date-fns'
+import { format } from 'date-fns'
 
 interface TaskItemProps {
   task: Task
@@ -26,6 +26,20 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
       await onToggleComplete(task.id)
     } finally {
       setIsToggling(false)
+    }
+  }
+
+  // Format timestamps as absolute dates
+  const formatTimestamp = (dateString: string | null | undefined): string => {
+    if (!dateString) return 'Not available'
+
+    try {
+      const date = new Date(dateString)
+      // Format: "Jan 15, 2026 at 2:30 PM"
+      return format(date, 'MMM d, yyyy \'at\' h:mm a')
+    } catch (error) {
+      console.error('Failed to format timestamp:', error)
+      return 'Invalid date'
     }
   }
 
@@ -52,15 +66,22 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
           {task.description && (
             <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
           )}
-          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+
+          {/* Updated timestamp display */}
+          <div className="flex flex-col gap-1 mt-2 text-xs text-muted-foreground">
             <span>
-              Created {formatDistanceToNow(new Date(task.created_at), { addSuffix: true })}
+              Created on {formatTimestamp(task.created_at)}
             </span>
-            {task.completed && task.completed_at && (
+            {task.updated_at && task.updated_at !== task.created_at && (
               <span>
-                ✓ Completed {formatDistanceToNow(new Date(task.completed_at), { addSuffix: true })}
+                Updated on {formatTimestamp(task.updated_at)}
               </span>
             )}
+            {task.completed && task.completed_at ? (
+              <span className="text-green-600 dark:text-green-400">
+                ✓ Completed on {formatTimestamp(task.completed_at)}
+              </span>
+            ) : null}
           </div>
         </div>
 

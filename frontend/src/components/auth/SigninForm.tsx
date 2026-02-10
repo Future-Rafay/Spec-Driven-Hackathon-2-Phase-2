@@ -46,22 +46,27 @@ export default function SigninForm() {
         body: JSON.stringify({ email, password }),
       })
 
-      // Store token in localStorage
+      // CRITICAL: Store token FIRST, then refresh auth, then redirect
+      // This ensures auth state is fully resolved before navigation
       localStorage.setItem('auth_token', response.token)
 
-      // Refresh global auth state
+      // Wait for auth state to update
       await refreshAuth()
 
-      // Redirect to dashboard
+      // Small delay to ensure state propagation (prevents flicker)
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Now safe to redirect
       router.push('/dashboard')
     } catch (err) {
-      // Display error
+      // CRITICAL: Keep loading false and display error
+      // Do NOT redirect on error
       if (err instanceof Error) {
         setError(err.message)
       } else {
         setError('An unexpected error occurred')
       }
-    } finally {
+      // Ensure loading is false so user can retry
       setLoading(false)
     }
   }

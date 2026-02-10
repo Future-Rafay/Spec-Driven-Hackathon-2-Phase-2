@@ -86,22 +86,23 @@ export default function SignupForm() {
         body: JSON.stringify({ email, password }),
       })
 
-      // Store token in localStorage
+      // CRITICAL: Same sequencing as signin to prevent flicker
       localStorage.setItem('auth_token', response.token)
-
-      // Refresh global auth state
       await refreshAuth()
-
-      // Redirect to dashboard
+      await new Promise(resolve => setTimeout(resolve, 100))
       router.push('/dashboard')
     } catch (err) {
-      // Display error
+      // Enhanced error handling for signup-specific errors
       if (err instanceof Error) {
-        setError(err.message)
+        // Check for duplicate email error (409 Conflict)
+        if (err.message.includes('already exists')) {
+          setError('An account with this email already exists. Please sign in instead.')
+        } else {
+          setError(err.message)
+        }
       } else {
         setError('An unexpected error occurred')
       }
-    } finally {
       setLoading(false)
     }
   }

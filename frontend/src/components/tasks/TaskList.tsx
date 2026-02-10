@@ -12,7 +12,7 @@ import { TaskSkeleton } from './TaskSkeleton'
 import { TaskEmptyState } from './TaskEmptyState'
 import { CreateTaskForm } from './CreateTaskForm'
 import { EditTaskModal } from './EditTaskModal'
-import { DeleteConfirmDialog } from './DeleteConfirmDialog'
+import { DeleteTaskModal } from './DeleteTaskModal'
 import type { Task } from '@/types/task'
 
 export function TaskList() {
@@ -22,7 +22,7 @@ export function TaskList() {
 
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
-  const [deletingTask, setDeletingTask] = useState<Task | null>(null)
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null)
 
   const handleToggleComplete = (id: string) => {
     toggleComplete.mutate(id)
@@ -33,13 +33,18 @@ export function TaskList() {
   }
 
   const handleDelete = (task: Task) => {
-    setDeletingTask(task)
+    setTaskToDelete(task)
   }
 
-  const handleConfirmDelete = () => {
-    if (deletingTask) {
-      deleteTask.mutate(deletingTask.id)
-      setDeletingTask(null)
+  const confirmDelete = async () => {
+    if (!taskToDelete) return
+
+    try {
+      await deleteTask.mutateAsync(taskToDelete.id)
+      setTaskToDelete(null)
+    } catch (error) {
+      // Error is handled by mutation
+      console.error('Delete failed:', error)
     }
   }
 
@@ -117,11 +122,12 @@ export function TaskList() {
         />
       )}
 
-      {deletingTask && (
-        <DeleteConfirmDialog
-          task={deletingTask}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setDeletingTask(null)}
+      {taskToDelete && (
+        <DeleteTaskModal
+          task={taskToDelete}
+          onConfirm={confirmDelete}
+          onCancel={() => setTaskToDelete(null)}
+          isDeleting={deleteTask.isPending}
         />
       )}
     </div>
