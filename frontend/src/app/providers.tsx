@@ -6,7 +6,7 @@
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider } from 'next-themes'
 import { useState } from 'react'
 import { AuthProvider } from '@/components/auth/AuthProvider'
@@ -37,7 +37,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           storageKey="todo-theme"
         >
           {children}
-          <ReactQueryDevtools initialIsOpen={false} />
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

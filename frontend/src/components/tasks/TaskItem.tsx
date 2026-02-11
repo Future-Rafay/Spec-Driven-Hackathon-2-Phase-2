@@ -68,21 +68,24 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
           )}
 
           {/* Updated timestamp display */}
-          <div className="flex flex-col gap-1 mt-2 text-xs text-muted-foreground">
-            <span>
-              Created on {formatTimestamp(task.created_at)}
-            </span>
-            {task.updated_at && task.updated_at !== task.created_at && (
-              <span>
-                Updated on {formatTimestamp(task.updated_at)}
-              </span>
-            )}
-            {task.completed && task.completed_at ? (
-              <span className="text-green-600 dark:text-green-400">
-                ✓ Completed on {formatTimestamp(task.completed_at)}
-              </span>
-            ) : null}
-          </div>
+         <div className="flex-col md:flex-row flex gap-2 md:gap-4 mt-2 text-xs text-muted-foreground">
+  {task.updated_at && task.updated_at !== task.created_at ? (
+    <span>
+      Updated on {formatTimestamp(task.updated_at)}
+    </span>
+  ) : (
+    <span>
+      Created on {formatTimestamp(task.created_at)}
+    </span>
+  )}
+
+  {task.completed && task.completed_at && (
+    <span className="text-green-600 dark:text-green-400">
+      ✓ Completed on {formatTimestamp(task.completed_at)}
+    </span>
+  )}
+</div>
+
         </div>
 
         {/* Actions */}
