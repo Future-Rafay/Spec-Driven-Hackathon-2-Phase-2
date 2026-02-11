@@ -4,7 +4,6 @@
 
 'use client'
 
-import React from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Container } from './Container'
@@ -27,7 +26,7 @@ export function Header({ userEmail }: HeaderProps) {
       <Container>
         <div className="flex items-center justify-between h-16">
           {/* Logo/Title */}
-          <Link href="/dashboard" className="text-xl font-bold text-foreground">
+          <Link href="/dashboard" className="text-xl font-bold font-montserrat text-foreground">
             Todo App
           </Link>
 

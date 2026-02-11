@@ -1,9 +1,9 @@
 /**
  * Auth layout for signin/signup pages
- * Simple centered layout with footer
+ * Uses PublicLayout with centered content
  */
 
-import { Footer } from '@/components/layout/Footer'
+import { PublicLayout } from '@/components/layout/PublicLayout'
 
 export default function AuthLayout({
   children,
@@ -11,11 +11,10 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 flex items-center justify-center">
+    <PublicLayout>
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         {children}
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PublicLayout>
   )
 }

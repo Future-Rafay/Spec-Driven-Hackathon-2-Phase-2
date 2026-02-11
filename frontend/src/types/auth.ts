@@ -35,3 +35,21 @@ export interface DecodedToken {
   exp: number             // Expiration timestamp (Unix epoch seconds)
   iat: number             // Issued at timestamp (Unix epoch seconds)
 }
+
+/**
+ * Auth Provider state for centralized authentication management
+ */
+export interface AuthProviderState {
+  isAuthenticated: boolean
+  isLoading: boolean
+  userEmail: string | null
+  error: string | null
+}
+
+/**
+ * Auth Context value with state and actions
+ */
+export interface AuthContextValue extends AuthProviderState {
+  signout: () => Promise<void>
+  refreshAuth: () => Promise<void>
+}
